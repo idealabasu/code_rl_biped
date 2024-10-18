@@ -113,6 +113,7 @@ class BipedEnv(gymnasium.Env):
         self.data.qpos = numpy.array(self.init_qpos)
         self.data.qvel = numpy.array(self.init_qvel)
         self.last_x_pos = self.data.body('trunk').xpos.copy()[0]
+        self.early_term = False
 
         if self.render_mode == "human":
             self.render()
@@ -190,6 +191,9 @@ class BipedEnv(gymnasium.Env):
         observation = self._get_obs()
         reward = pos[0]*self.reward_weights['forward_progress']+vel[0]*self.reward_weights['current_velocity']
         
+        if pos[2]<.05:
+            self.early_term = True
+
         truncated = False
         info = {}
 
